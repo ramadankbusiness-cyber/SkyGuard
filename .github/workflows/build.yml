@@ -29,20 +29,21 @@ jobs:
       - name: Install Cordova and Build
         run: |
           npm install -g cordova
-          # إنشاء مشروع كوردوفا جديد نظيف تماماً في فولدر فرعي
           cordova create build_dir com.ramadan.skyguard "SkyGuard Drone"
           
-          # نقل ملفات الأكواد والإعدادات الخاصة بك لداخل المشروع الجديد
+          # نقل الملفات الأساسية
           cp config.xml build_dir/config.xml
           cp index.html build_dir/www/index.html
           cp script.js build_dir/www/script.js
           
-          # الدخول للمشروع وبناء الأندرويد
+          ### هنا السحر: نسخ الأيقونة لداخل مشروع كوردوفا ###
+          cp icon.png build_dir/icon.png
+          
+          # بناء التطبيق
           cd build_dir
           cordova platform add android --no-telemetry
           cordova build android --debug --no-telemetry
           
-          # نقل الـ APK النهائي للخارج عشان الأكشن يشوفه ويرفعه لك
           mkdir -p ../output_apk
           cp platforms/android/app/build/outputs/apk/debug/app-debug.apk ../output_apk/SkyGuard_Drone.apk
 
