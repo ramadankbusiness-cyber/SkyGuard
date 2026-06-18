@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SkyGuard Tactile Controller</title>
+    <style>
+        :root {
+            --bg-main: #040507;          
+            --bg-panel: rgba(13, 17, 23, 0.7); 
+            --neon-green: #39ff14;       
+            --neon-orange: #ff5500;      
+            --cyber-blue: #00e5ff;       
+            --dark-border: #21262d;      
+            --text-muted: #57606a;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; touch-action: none; }
+        body {
+            background-color: var(--bg-main);
+            background-image: linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
+            background-size: 4vh 4vh; color: #fff; font-family: 'Courier New', Courier, monospace; overflow: hidden;
+            width: 100vw; height: 100vh; display: grid; grid-template-columns: 1fr 1.1fr 1fr; grid-template-rows: 8vh 88vh; padding: 2vh 2vw; gap: 2vw;
+        }
+        .header-system { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--dark-border); font-size: min(2.5vw, 11px); color: var(--text-muted); height: 100%; }
+        .header-system span.status { color: var(--neon-orange); text-shadow: 0 0 8px var(--neon-orange); font-weight: bold; }
+        .control-bay-left, .control-bay-right { display: flex; flex-direction: column; justify-content: space-around; align-items: center; background: var(--bg-panel); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--dark-border); border-radius: 3vh; padding: 2vh 2vw; height: 100%; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .control-bay-left::before, .control-bay-right::before { content: ''; position: absolute; top: -1px; left: -1px; width: 2vh; height: 2vh; border-top: 3px solid var(--cyber-blue); border-left: 3px solid var(--cyber-blue); border-radius: 3vh 0 0 0; }
+        .select-group-container { width: 100%; display: flex; flex-direction: column; gap: 1vh; }
+        .cyber-select-wrapper { display: flex; flex-direction: column; width: 100%; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(0, 229, 255, 0.15); padding: 0.8vh 1vw; border-radius: 1vh; }
+        .select-label { font-size: min(2vw, 10px); color: var(--cyber-blue); margin-bottom: 0.4vh; text-shadow: 0 0 5px rgba(0, 229, 255, 0.5); text-align: right; }
+        .cyber-select { background: #05070a; color: #fff; border: 1px solid #161b22; border-radius: 0.5vh; padding: 0.8vh; font-size: min(2.2vw, 11px); font-family: monospace; outline: none; width: 100%; -webkit-appearance: none; appearance: none; text-align: center; }
+        .joystick-container { width: 24vh; height: 24vh; max-width: 85%; max-height: 50%; background: radial-gradient(circle, #090d14 0%, #020305 100%); border: 2px solid var(--dark-border); border-radius: 50%; position: relative; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 15px rgba(0,0,0,0.8); }
+        .joystick-container::after { content: ''; position: absolute; width: 50%; height: 50%; border: 1px dashed rgba(255,255,255,0.05); border-radius: 50%; pointer-events: none; }
+        .joystick-knob { width: 8vh; height: 8vh; background: radial-gradient(circle, #1f242c 0%, #0d1117 100%); border: 2px solid var(--neon-orange); border-radius: 50%; position: absolute; box-shadow: 0 0 15px rgba(255, 85, 0, 0.6); }
+        .center-hud { display: flex; flex-direction: column; justify-content: space-between; background: #020503; border: 2px solid #1f242d; border-radius: 2.5vh; padding: 2vh 2vw; height: 100%; box-shadow: inset 0 0 30px rgba(0,0,0,0.95); position: relative; }
+        .center-hud::before { content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%); z-index: 10; background-size: 100% 4px; pointer-events: none; border-radius: 2.3vh; }
+        .hud-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1vh 2vw; font-size: min(2.5vw, 12px); font-weight: bold; color: var(--neon-green); text-shadow: 0 0 6px rgba(57, 255, 20, 0.6); direction: ltr; }
+        .hud-title { font-size: min(2.3vw, 11px); color: var(--neon-green); text-align: center; letter-spacing: 1px; border-bottom: 1px dashed rgba(57, 255, 20, 0.2); padding-bottom: 0.5vh; }
+        .warning-strip { background: repeating-linear-gradient(-45deg, #ff5500, #ff5500 10px, #020503 10px, #020503 20px); height: 1.2vh; width: 100%; border-radius: 0.6vh; }
+        .bay-footer-label { font-size: min(1.8vw, 9px); color: var(--text-muted); text-align: center; letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+    <div class="header-system">
+        <div>SYS_MTRX: SKYGUARD_V3_CLEAN</div>
+        <div>LINK_STABLE: <span class="status" id="connStatus">DISCONNECTED</span></div>
+    </div>
+    <div class="control-bay-left">
+        <div class="select-group-container">
+            <div class="cyber-select-wrapper"><label class="select-label">SwA (CH5)</label><select class="cyber-select" id="select_swa" onchange="setSwitchFromSelect('swa', this.value)"><option value="1000">UP (1000)</option><option value="2000">DN (2000)</option></select></div>
+            <div class="cyber-select-wrapper"><label class="select-label">SwB (CH6)</label><select class="cyber-select" id="select_swb" onchange="setSwitchFromSelect('swb', this.value)"><option value="1000">UP (1000)</option><option value="2000">DN (2000)</option></select></div>
+        </div>
+        <div class="joystick-container" id="leftJoystickBox"><div class="joystick-knob" id="leftKnob"></div></div>
+        <div class="bay-footer-label">CH_3 / CH_4 ENGINE_BAY</div>
+    </div>
+    <div class="center-hud">
+        <div class="hud-title">// FLIGHT MATRIX TELEMETRY //</div>
+        <div class="hud-grid">
+            <div>RC1_RLL: <span id="val_ch0">1500</span></div><div>RC6_SWB: <span id="val_ch5">1000</span></div>
+            <div>RC2_PTC: <span id="val_ch1">1500</span></div><div>RC7_SWC: <span id="val_ch6">1000</span></div>
+            <div>RC3_THR: <span id="val_ch2">1000</span></div><div>RC8_SWD: <span id="val_ch7">1000</span></div>
+            <div>RC4_YAW: <span id="val_ch3">1500</span></div><div>RC9_VRA: <span id="val_ch8">1000</span></div>
+            <div>RC10_AUX: <span id="val_ch9">1000</span></div>
+        </div>
+        <div><div class="warning-strip"></div><div style="font-size: min(1.8vw, 8px); color: var(--neon-orange); margin-top: 0.4vh; text-align: center; font-weight: bold;">CRITICAL WARNING: DISENGAGE MOTORS</div></div>
+    </div>
+    <div class="control-bay-right">
+        <div class="select-group-container">
+            <div class="cyber-select-wrapper"><label class="select-label">SwC (CH7 - 3P)</label><select class="cyber-select" id="select_swc" onchange="setSwitchFromSelect('swc', this.value)"><option value="1000">UP (1000)</option><option value="1500">MID (1500)</option><option value="2000">DN (2000)</option></select></div>
+            <div class="cyber-select-wrapper"><label class="select-label">SwD (CH8)</label><select class="cyber-select" id="select_swd" onchange="setSwitchFromSelect('swd', this.value)"><option value="1000">UP (1000)</option><option value="2000">DN (2000)</option></select></div>
+        </div>
+        <div class="joystick-container" id="rightJoystickBox"><div class="joystick-knob" id="rightKnob"></div></div>
+        <div class="bay-footer-label">CH_1 / CH_2 VECTOR_BAY</div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
