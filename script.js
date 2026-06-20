@@ -2,8 +2,10 @@ var ch = [1500, 1500, 1000, 1500, 1000, 1000, 1000, 1000, 1000, 1000];
 var ws;
 
 function connectWS() {
-    // تم تثبيت الآي بي الخاص بالـ ESP32 ليعمل داخل الـ APK مباشرة بدون متصفح
-    ws = new WebSocket('ws://192.168.4.1:81/');
+    // كتابة الـ IP صراحةً لأن التطبيق الـ APK لا يملك hostname كالمتصفح
+    let host = "192.168.4.1"; 
+    
+    ws = new WebSocket('ws://' + host + ':81/');
     ws.onopen = function() { 
         document.getElementById('connStatus').innerText = 'CONNECTED'; 
         document.getElementById('connStatus').style.color = '#39ff14'; 
